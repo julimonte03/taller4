@@ -1,7 +1,5 @@
 package aed;
 
-import java.util.*;
-
 public class ListaEnlazada<T> implements Secuencia<T> {
     private Nodo primerNodo;
     private Nodo ultimNodo;
@@ -20,7 +18,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     public int longitud() {
-        return size;
+        return this.size;
     }
 
     public void agregarAdelante(T elem) {
@@ -36,9 +34,8 @@ public class ListaEnlazada<T> implements Secuencia<T> {
             this.primerNodo = nuevoNodo;
         }
     
-        this.size+=1;
+        this.size++;
     }
-    
 
     public void agregarAtras(T elem) {
         Nodo nuevoNodo = new Nodo();
@@ -53,7 +50,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
             this.ultimNodo = nuevoNodo;
         }
     
-        this.size+=1;
+        this.size++;
     }
 
     public T obtener(int i) {
@@ -64,82 +61,129 @@ public class ListaEnlazada<T> implements Secuencia<T> {
         }
         return nuevoNodo.elemento;
     }
-    
 
     public void eliminar(int i) {
-        // lista vacía?
         if (this.primerNodo != null) {
-
-        if (i == 0) {
-            this.primerNodo = this.primerNodo.siguiente;
-            if (this.primerNodo != null) {
-                this.primerNodo.anterior = null;
-            } else {
-                this.ultimNodo = null; 
+            if (i == 0) {
+                this.primerNodo = this.primerNodo.siguiente;
+                if (this.primerNodo != null) {
+                    this.primerNodo.anterior = null;
+                } else {
+                    this.ultimNodo = null; 
+                }
+                this.size--;
+                return;
             }
-            this.size--;
-            return;
-        }
-    
-        Nodo nuevoNodo = this.primerNodo;
-        for (int j = 0; j < i; j++) {
-            nuevoNodo = nuevoNodo.siguiente;
-        }
-    
-        if (nuevoNodo.anterior != null) {
-            nuevoNodo.anterior.siguiente = nuevoNodo.siguiente;
-        }
-        if (nuevoNodo.siguiente != null) {
-            nuevoNodo.siguiente.anterior = nuevoNodo.anterior;
-        }
-    
-        nuevoNodo = null;
-    
-        this.size--;   
+        
+            Nodo nuevoNodo = this.primerNodo;
+            for (int j = 0; j < i; j++) {
+                nuevoNodo = nuevoNodo.siguiente;
+            }
+        
+            if (nuevoNodo.anterior != null) {
+                nuevoNodo.anterior.siguiente = nuevoNodo.siguiente;
+            }
+            if (nuevoNodo.siguiente != null) {
+                nuevoNodo.siguiente.anterior = nuevoNodo.anterior;
+            }
+        
+            if (nuevoNodo == this.ultimNodo) {
+                this.ultimNodo = nuevoNodo.anterior;
+            }
+        
+            nuevoNodo = null;
+        
+            this.size--;   
         }
     }
-    
 
     public void modificarPosicion(int indice, T elem) {
-        throw new UnsupportedOperationException("No implementada aun");
+        Nodo nuevoNodo = primerNodo;
+        for(int i = 0; i < indice; i++){
+            nuevoNodo = nuevoNodo.siguiente;
+        }
+
+        nuevoNodo.elemento = elem;
     }
 
     public ListaEnlazada<T> copiar() {
-        throw new UnsupportedOperationException("No implementada aun");
+        ListaEnlazada<T> copia = new ListaEnlazada<>();
+        Nodo nuevoNodo = this.primerNodo;
+
+        while (nuevoNodo != null) {
+            copia.agregarAtras(nuevoNodo.elemento); 
+            nuevoNodo = nuevoNodo.siguiente;
+        }
+
+        return copia;
     }
 
     public ListaEnlazada(ListaEnlazada<T> lista) {
-        throw new UnsupportedOperationException("No implementada aun");
+        this();
+
+        Nodo nodoOriginal = lista.primerNodo;
+        while (nodoOriginal != null) {
+            this.agregarAtras(nodoOriginal.elemento);
+            nodoOriginal = nodoOriginal.siguiente;
+        }
     }
     
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
+        if (primerNodo == null) {
+            return "[]";
+        }
+
+        StringBuilder result = new StringBuilder("["); 
+        Nodo nodoActual = primerNodo;
+
+        while (nodoActual != null) {
+            result.append(nodoActual.elemento);
+            nodoActual = nodoActual.siguiente;
+            if (nodoActual != null) {
+                result.append(", ");
+            }
+        }
+
+        result.append("]");
+        return result.toString();
     }
 
     private class ListaIterador implements Iterador<T> {
-    	// Completar atributos privados
+        private Nodo actual = primerNodo;
+        private Nodo ultimoRetornado = null;
 
+        @Override
         public boolean haySiguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
-        }
-        
-        public boolean hayAnterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            return actual != null;
         }
 
+        @Override
         public T siguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
-        }
-        
 
+            ultimoRetornado = actual;
+            T dato = actual.elemento;
+            actual = actual.siguiente;
+            return dato;
+        }
+
+        @Override
+        public boolean hayAnterior() {
+            return actual != null && actual.anterior != null;
+        }
+
+        @Override
         public T anterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+
+            actual = ultimoRetornado;
+            T dato = actual.elemento;
+            ultimoRetornado = ultimoRetornado.anterior;
+            return dato;
         }
     }
+
 
     public Iterador<T> iterador() {
-	    throw new UnsupportedOperationException("No implementada aun");
+        return new ListaIterador();
     }
-
 }
